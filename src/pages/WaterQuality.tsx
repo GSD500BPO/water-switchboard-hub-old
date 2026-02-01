@@ -10,29 +10,15 @@ import {
   Droplets, 
   MapPin, 
   Phone,
-  Shield
+  Shield,
+  Info
 } from "lucide-react";
-
-// Mock water quality data - will be replaced with real data
-const mockWaterData = {
-  zip: "90210",
-  city: "Beverly Hills",
-  state: "CA",
-  sourceType: "Municipal",
-  hardnessLevel: "Moderate",
-  overallRating: "Good",
-  contaminants: [
-    { name: "Lead", level: 2.5, safeLimit: 15, unit: "ppb", status: "safe" },
-    { name: "Chlorine", level: 1.2, safeLimit: 4, unit: "ppm", status: "safe" },
-    { name: "PFAS", level: 12, safeLimit: 4, unit: "ppt", status: "elevated" },
-    { name: "Arsenic", level: 3.1, safeLimit: 10, unit: "ppb", status: "safe" },
-    { name: "Nitrate", level: 5.2, safeLimit: 10, unit: "ppm", status: "safe" },
-  ],
-};
+import { getWaterQualityByZip, hasSpecificData } from "@/data/waterQualityData";
 
 export default function WaterQuality() {
   const { zip } = useParams<{ zip: string }>();
-  const data = mockWaterData; // In real app, fetch based on ZIP
+  const data = getWaterQualityByZip(zip || "00000");
+  const hasSpecific = hasSpecificData(zip || "");
 
   return (
     <div className="min-h-screen flex flex-col">
@@ -51,6 +37,12 @@ export default function WaterQuality() {
             <p className="text-primary-foreground/80">
               Independent water quality data for your area
             </p>
+            {!hasSpecific && (
+              <div className="mt-3 inline-flex items-center gap-2 bg-primary-foreground/10 px-3 py-2 rounded-lg text-sm">
+                <Info className="h-4 w-4" />
+                <span>Based on regional data — your local water may vary</span>
+              </div>
+            )}
           </div>
         </section>
 
@@ -79,7 +71,15 @@ export default function WaterQuality() {
                     </div>
                     <div className="p-4 bg-muted rounded-lg">
                       <div className="text-sm text-muted-foreground mb-1">Overall</div>
-                      <Badge variant="secondary" className="bg-green-100 text-green-800">
+                      <Badge 
+                        variant="secondary" 
+                        className={
+                          data.overallRating === "Excellent" ? "bg-green-100 text-green-800" :
+                          data.overallRating === "Good" ? "bg-green-100 text-green-800" :
+                          data.overallRating === "Fair" ? "bg-amber-100 text-amber-800" :
+                          "bg-red-100 text-red-800"
+                        }
+                      >
                         {data.overallRating}
                       </Badge>
                     </div>
@@ -119,10 +119,15 @@ export default function WaterQuality() {
                                   <CheckCircle className="h-3 w-3 mr-1" />
                                   Safe
                                 </Badge>
-                              ) : (
+                              ) : contaminant.status === "elevated" ? (
                                 <Badge variant="secondary" className="bg-amber-100 text-amber-800">
                                   <AlertTriangle className="h-3 w-3 mr-1" />
                                   Elevated
+                                </Badge>
+                              ) : (
+                                <Badge variant="secondary" className="bg-red-100 text-red-800">
+                                  <AlertTriangle className="h-3 w-3 mr-1" />
+                                  High
                                 </Badge>
                               )}
                             </td>
@@ -182,7 +187,10 @@ export default function WaterQuality() {
                 <CardContent>
                   <p className="text-sm text-muted-foreground">
                     Water quality data is compiled from EPA reports, local utility disclosures, 
-                    and community testing results. Last updated: January 2026.
+                    and community testing results. Last updated: {data.lastUpdated}.
+                  </p>
+                  <p className="text-xs text-muted-foreground mt-2 italic">
+                    This data is for informational purposes. Request a free test for your specific home's water quality.
                   </p>
                 </CardContent>
               </Card>
