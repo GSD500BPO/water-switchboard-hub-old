@@ -1,8 +1,9 @@
 import { Link } from "react-router-dom";
-import { Beaker, AlertTriangle, Bug, Thermometer, FlaskConical, Activity, Droplets, ClipboardCheck, HelpCircle } from "lucide-react";
+import { Beaker, AlertTriangle, Bug, Thermometer, FlaskConical, Activity, Droplets, ClipboardCheck, HelpCircle, Phone } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from "@/components/ui/card";
 import { useLanguage } from "@/contexts/LanguageContext";
+import { useDealer } from "@/contexts/DealerContext";
 
 const testTypes = [
   {
@@ -73,6 +74,7 @@ const testTypes = [
 
 export function WaterTestingServices() {
   const { t } = useLanguage();
+  const { isDealerMode } = useDealer();
 
   return (
     <section className="py-16 md:py-24 bg-muted">
@@ -83,11 +85,13 @@ export function WaterTestingServices() {
             {t("tests.title")}
           </h2>
           <p className="text-lg text-muted-foreground">
-            {t("tests.subtitle")}
+            {isDealerMode ? t("tests.subtitleDealer") : t("tests.subtitle")}
           </p>
-          <p className="text-sm text-secondary mt-2 font-medium">
-            {t("tests.contact")}
-          </p>
+          {!isDealerMode && (
+            <p className="text-sm text-secondary mt-2 font-medium">
+              {t("tests.contact")}
+            </p>
+          )}
         </div>
 
         {/* Test Cards Grid */}
@@ -114,7 +118,10 @@ export function WaterTestingServices() {
                 <CardDescription className="text-sm">
                   {t(test.descKey)}
                 </CardDescription>
-                <p className="text-2xl font-bold text-primary mt-3">{test.price}</p>
+                {/* Only show price when NOT in dealer mode */}
+                {!isDealerMode && (
+                  <p className="text-2xl font-bold text-primary mt-3">{test.price}</p>
+                )}
               </CardContent>
               <CardFooter className="flex gap-2">
                 <Button variant="outline" size="sm" className="flex-1" asChild>
@@ -122,15 +129,18 @@ export function WaterTestingServices() {
                     {t("tests.learnMore")}
                   </Link>
                 </Button>
-                <Button size="sm" className="flex-1 bg-secondary hover:bg-secondary/90">
-                  {t("tests.addToCart")}
-                </Button>
+                {/* Only show Add to Cart when NOT in dealer mode */}
+                {!isDealerMode && (
+                  <Button size="sm" className="flex-1 bg-secondary hover:bg-secondary/90">
+                    {t("tests.addToCart")}
+                  </Button>
+                )}
               </CardFooter>
             </Card>
           ))}
         </div>
 
-        {/* Unsure Section */}
+        {/* Unsure Section - Different CTA for dealer mode */}
         <Card className="max-w-2xl mx-auto bg-primary text-primary-foreground">
           <CardContent className="p-8 text-center">
             <HelpCircle className="h-12 w-12 mx-auto mb-4 opacity-80" />
@@ -138,21 +148,25 @@ export function WaterTestingServices() {
               {t("tests.unsure.title")}
             </h3>
             <p className="opacity-80 mb-4">
-              {t("tests.unsure.desc")}
+              {isDealerMode ? t("tests.unsure.descDealer") : t("tests.unsure.desc")}
             </p>
             <div className="flex flex-col sm:flex-row gap-3 justify-center">
               <Button
                 variant="secondary"
                 className="bg-card text-foreground hover:bg-card/90"
               >
+                <Phone className="w-4 h-4 mr-2" />
                 {t("tests.freeTest")}
               </Button>
-              <Button
-                variant="outline"
-                className="border-primary-foreground/30 text-primary-foreground hover:bg-primary-foreground/10"
-              >
-                {t("tests.orderKit")}
-              </Button>
+              {/* Only show Order Kit when NOT in dealer mode */}
+              {!isDealerMode && (
+                <Button
+                  variant="outline"
+                  className="border-primary-foreground/30 text-primary-foreground hover:bg-primary-foreground/10"
+                >
+                  {t("tests.orderKit")}
+                </Button>
+              )}
             </div>
           </CardContent>
         </Card>

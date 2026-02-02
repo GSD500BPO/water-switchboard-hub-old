@@ -1,8 +1,9 @@
-import { useState, useEffect } from "react";
+import { useState } from "react";
 import { X } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { useLanguage } from "@/contexts/LanguageContext";
+import { useDealer } from "@/contexts/DealerContext";
 import heroImage from "@/assets/hero-water-testing.jpg";
 
 interface LeadCapturePopupProps {
@@ -12,14 +13,33 @@ interface LeadCapturePopupProps {
 
 export function LeadCapturePopup({ isOpen, onClose }: LeadCapturePopupProps) {
   const { t } = useLanguage();
+  const { dealer, isDealerMode, detectionSource } = useDealer();
   const [email, setEmail] = useState("");
   const [zip, setZip] = useState("");
   const [phone, setPhone] = useState("");
+  const [isSubmitting, setIsSubmitting] = useState(false);
 
-  const handleSubmit = (e: React.FormEvent) => {
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    // Store lead data (mock for now)
-    console.log("Lead captured:", { email, zip, phone });
+    setIsSubmitting(true);
+    
+    // Prepare lead data with dealer attribution
+    const leadData = {
+      email,
+      zip,
+      phone: phone || null,
+      dealer_id: dealer?.id || null,
+      lead_source: dealer ? `Dealer: ${dealer.name}` : "Organic",
+      detection_source: detectionSource,
+      created_at: new Date().toISOString(),
+    };
+    
+    // Log for now - will be sent to backend when Zoho webhook is configured
+    console.log("Lead captured:", leadData);
+    
+    // TODO: Send to Supabase edge function for Zoho CRM integration
+    
+    setIsSubmitting(false);
     onClose();
   };
 
@@ -85,9 +105,10 @@ export function LeadCapturePopup({ isOpen, onClose }: LeadCapturePopupProps) {
                 />
                 <Button
                   type="submit"
+                  disabled={isSubmitting}
                   className="w-full h-12 bg-secondary hover:bg-secondary/90 text-secondary-foreground font-semibold"
                 >
-                  {t("popup.cta")}
+                  {isSubmitting ? "..." : t("popup.cta")}
                 </Button>
               </form>
 

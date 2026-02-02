@@ -33,10 +33,12 @@ export type TranslationKey =
   | "popup.privacy"
   | "tests.title"
   | "tests.subtitle"
+  | "tests.subtitleDealer"
   | "tests.orderKit"
   | "tests.freeTest"
   | "tests.learnMore"
   | "tests.addToCart"
+  | "tests.requestTest"
   | "tests.standard.title"
   | "tests.standard.desc"
   | "tests.heavyMetals.title"
@@ -55,7 +57,13 @@ export type TranslationKey =
   | "tests.comprehensive.desc"
   | "tests.unsure.title"
   | "tests.unsure.desc"
-  | "tests.contact";
+  | "tests.unsure.descDealer"
+  | "tests.contact"
+  | "dealer.yourExpert"
+  | "dealer.verified"
+  | "dealer.contactCta"
+  | "dealer.freeTest"
+  | "dealer.sponsored";
 
 type Translations = {
   [lang: string]: {
@@ -99,10 +107,12 @@ export const translations: Translations = {
     "popup.privacy": "Al enviar, recibirás actualizaciones. Cancela en cualquier momento.",
     "tests.title": "¿Qué Pruebas de Agua Están Disponibles?",
     "tests.subtitle": "Ordena tus propios kits de prueba o solicita una prueba gratuita de nuestros especialistas certificados por la EPA. Te presentarán opciones de filtros sin costo ni compromiso.",
+    "tests.subtitleDealer": "Solicita una prueba gratuita de nuestro especialista certificado por la EPA. Te presentará opciones de filtros sin costo ni compromiso.",
     "tests.orderKit": "Ordenar Kit",
     "tests.freeTest": "Prueba Gratis",
     "tests.learnMore": "Más Información",
     "tests.addToCart": "Agregar al Carrito",
+    "tests.requestTest": "Solicitar Prueba",
     "tests.standard.title": "Prueba Estándar de Agua Potable",
     "tests.standard.desc": "Cubre muchas bases, especialmente para casas nuevas o cuando no está claro qué está mal. Incluye pruebas de química y bacterias.",
     "tests.heavyMetals.title": "Prueba de Metales Pesados",
@@ -121,7 +131,13 @@ export const translations: Translations = {
     "tests.comprehensive.desc": "Análisis exhaustivo que incluye todos los parámetros para una evaluación completa de la calidad de tu agua.",
     "tests.unsure.title": "¿No estás seguro qué prueba necesitas?",
     "tests.unsure.desc": "Contáctanos para asesoría personalizada sobre qué prueba es mejor para tu situación.",
+    "tests.unsure.descDealer": "Solicita una prueba gratuita y nuestro experto te ayudará a determinar qué análisis necesitas.",
     "tests.contact": "Llama al 066-976 35 88 o envía un correo para asesoría.",
+    "dealer.yourExpert": "Tu Experto Local",
+    "dealer.verified": "Verificado EPA + Antecedentes",
+    "dealer.contactCta": "Contactar Experto",
+    "dealer.freeTest": "Solicitar Prueba Gratis",
+    "dealer.sponsored": "Patrocinado",
   },
   en: {
     "hero.title": "What's Really In Your Water?",
@@ -158,10 +174,12 @@ export const translations: Translations = {
     "popup.privacy": "By submitting, you'll receive updates. Unsubscribe any time.",
     "tests.title": "What Drinking Water Tests Are Available?",
     "tests.subtitle": "Order your own test kits or get a free test from our EPA-certified specialists. They'll present you filter options at no cost or obligation.",
+    "tests.subtitleDealer": "Request a free test from our EPA-certified specialist. They'll present you filter options at no cost or obligation.",
     "tests.orderKit": "Order Kit",
     "tests.freeTest": "Free Test",
     "tests.learnMore": "Learn More",
     "tests.addToCart": "Add to Cart",
+    "tests.requestTest": "Request Test",
     "tests.standard.title": "Standard Drinking Water Test",
     "tests.standard.desc": "Covers many bases, especially for new homes or when it isn't clear what's wrong. Includes chemistry and bacteria tests.",
     "tests.heavyMetals.title": "Heavy Metals Water Test",
@@ -180,6 +198,12 @@ export const translations: Translations = {
     "tests.comprehensive.desc": "Exhaustive analysis including all parameters for a complete assessment of your water quality.",
     "tests.unsure.title": "Unsure about the test for you?",
     "tests.unsure.desc": "Contact us for personalized advice on which test is best for your situation.",
+    "tests.unsure.descDealer": "Request a free test and our expert will help determine which analysis you need.",
     "tests.contact": "Call 066-976 35 88 or email for advice.",
+    "dealer.yourExpert": "Your Local Expert",
+    "dealer.verified": "EPA + Background Verified",
+    "dealer.contactCta": "Contact Expert",
+    "dealer.freeTest": "Request Free Test",
+    "dealer.sponsored": "Sponsored",
   },
 };

@@ -7,30 +7,35 @@ import { HowItWorks } from "@/components/home/HowItWorks";
 import { WaterAlerts } from "@/components/home/WaterAlerts";
 import { CategoryIcons } from "@/components/home/CategoryIcons";
 import { WaterTestingServices } from "@/components/home/WaterTestingServices";
+import { DealerExpertCard } from "@/components/home/DealerExpertCard";
+import { DealerVideos } from "@/components/home/DealerVideos";
 import { LeadCapturePopup } from "@/components/LeadCapturePopup";
+import { useDealer } from "@/contexts/DealerContext";
 
 const Index = () => {
   const [searchParams] = useSearchParams();
   const [showPopup, setShowPopup] = useState(false);
+  const { isDealerMode, detectionSource } = useDealer();
 
   useEffect(() => {
     // Check if user came from QR code or other tracked source
     const source = searchParams.get("source");
     const qrId = searchParams.get("qr_id");
-    const campaignId = searchParams.get("campaign_id");
     
-    // If NOT from QR code (which means they don't already have their info captured),
-    // show the popup after a delay
-    if (!qrId) {
-      const hasSeenPopup = sessionStorage.getItem("cwt-popup-seen");
-      if (!hasSeenPopup) {
-        const timer = setTimeout(() => {
-          setShowPopup(true);
-        }, 3000); // Show after 3 seconds
-        return () => clearTimeout(timer);
-      }
+    // If from QR code, skip popup (their info is already tracked via QR attribution)
+    if (qrId || detectionSource === "qr") {
+      return;
     }
-  }, [searchParams]);
+    
+    // Show popup for other visitors after a delay
+    const hasSeenPopup = sessionStorage.getItem("cwt-popup-seen");
+    if (!hasSeenPopup) {
+      const timer = setTimeout(() => {
+        setShowPopup(true);
+      }, 3000); // Show after 3 seconds
+      return () => clearTimeout(timer);
+    }
+  }, [searchParams, detectionSource]);
 
   const handleClosePopup = () => {
     setShowPopup(false);
@@ -42,8 +47,24 @@ const Index = () => {
       <Header />
       <main className="flex-1">
         <Hero />
+        
+        {/* Show dealer expert card for dealer mode visitors */}
+        {isDealerMode && (
+          <section className="py-8 bg-background">
+            <div className="container mx-auto px-4">
+              <div className="max-w-md mx-auto">
+                <DealerExpertCard />
+              </div>
+            </div>
+          </section>
+        )}
+        
         <HowItWorks />
         <WaterTestingServices />
+        
+        {/* Show dealer videos for dealer mode */}
+        {isDealerMode && <DealerVideos />}
+        
         <WaterAlerts />
         <CategoryIcons />
       </main>
