@@ -202,6 +202,33 @@ export const zipToCity: Record<string, CityInfo> = {
   // Louisiana
   "70112": { city: "New Orleans", state: "LA", region: "southeast" },
   "70130": { city: "New Orleans", state: "LA", region: "southeast" },
+  
+  // Utah - Yamily Acosta territory
+  "84101": { city: "Salt Lake City", state: "UT", region: "west" },
+  "84102": { city: "Salt Lake City", state: "UT", region: "west" },
+  "84103": { city: "Salt Lake City", state: "UT", region: "west" },
+  "84104": { city: "Salt Lake City", state: "UT", region: "west" },
+  "84105": { city: "Salt Lake City", state: "UT", region: "west" },
+  "84111": { city: "Salt Lake City", state: "UT", region: "west" },
+  "84116": { city: "Salt Lake City", state: "UT", region: "west" },
+  "84601": { city: "Provo", state: "UT", region: "west" },
+  "84604": { city: "Provo", state: "UT", region: "west" },
+  "84606": { city: "Provo", state: "UT", region: "west" },
+  "84401": { city: "Ogden", state: "UT", region: "west" },
+  "84403": { city: "Ogden", state: "UT", region: "west" },
+  "84119": { city: "West Valley City", state: "UT", region: "west" },
+  "84120": { city: "West Valley City", state: "UT", region: "west" },
+  "84070": { city: "Sandy", state: "UT", region: "west" },
+  "84092": { city: "Sandy", state: "UT", region: "west" },
+  "84770": { city: "St. George", state: "UT", region: "west" },
+  "84790": { city: "St. George", state: "UT", region: "west" },
+  "84041": { city: "Layton", state: "UT", region: "west" },
+  "84084": { city: "West Jordan", state: "UT", region: "west" },
+  "84088": { city: "West Jordan", state: "UT", region: "west" },
+  "84057": { city: "Orem", state: "UT", region: "west" },
+  "84043": { city: "Lehi", state: "UT", region: "west" },
+  "84095": { city: "South Jordan", state: "UT", region: "west" },
+  "84020": { city: "Draper", state: "UT", region: "west" },
 };
 
 // State to region mapping for fallback
