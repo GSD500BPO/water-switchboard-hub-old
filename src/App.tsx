@@ -2,7 +2,7 @@ import { Toaster } from "@/components/ui/toaster";
 import { Toaster as Sonner } from "@/components/ui/sonner";
 import { TooltipProvider } from "@/components/ui/tooltip";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
-import { BrowserRouter, Routes, Route } from "react-router-dom";
+import { BrowserRouter, Routes, Route, Navigate } from "react-router-dom";
 import { LanguageProvider } from "@/contexts/LanguageContext";
 import { DealerProvider } from "@/contexts/DealerContext";
 import Index from "./pages/Index";
@@ -28,6 +28,11 @@ const App = () => (
               <Route path="/tests/:testId" element={<TestDetail />} />
               <Route path="/scam-alerts" element={<ScamAlerts />} />
               <Route path="/schedule-test" element={<ScheduleTest />} />
+              <Route path="/water-testing" element={<Navigate to="/schedule-test" replace />} />
+              <Route path="/filters" element={<Navigate to="/" replace />} />
+              <Route path="/privacy" element={<Navigate to="/" replace />} />
+              <Route path="/terms" element={<Navigate to="/" replace />} />
+              <Route path="/contact" element={<Navigate to="/" replace />} />
               {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
               <Route path="*" element={<NotFound />} />
             </Routes>
