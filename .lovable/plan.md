@@ -1,313 +1,254 @@
 
 
-# Utah Dealer System - Yamily Acosta Implementation
+# Scam Alerts Page - Reddit-Style Community Feed
 
 ## Overview
 
-This plan creates a dynamic dealer detection system that identifies visitors from Utah (via QR code, IP geo-location, or ZIP code) and shows them a customized "branded but anonymous" experience with lead routing to Yamily Acosta through Zoho CRM.
+This plan creates a killer scam alerts page with a Reddit-like design featuring upvote/downvote functionality, search/filter capabilities, category tags, and in-site framing. The page will showcase real Utah-focused scams (Sandy, Provo) plus general door-to-door water testing scam education, all while directing users to order legitimate test kits from your site.
 
 ---
 
-## Key Business Logic
+## Design Concept
 
 ```text
-Visitor arrives at communitywatertestusa.com
-              |
-              v
-    Has URL param "Lead Source UTAH Yamily ESP"?
-              |
-         YES -+-> Set dealer mode = Yamily
-              |   - Skip lead capture popup
-              |   - Track QR scan attribution
-              |
-             NO
-              |
-              v
-    Is visitor IP from Utah? (geo-detection API)
-              |
-         YES -+-> Set dealer mode = Yamily
-              |   - Show lead capture popup (collect info)
-              |
-             NO
-              |
-              v
-    User enters Utah ZIP (84xxx)?
-              |
-         YES -+-> Set dealer mode = Yamily
-              |
-             NO
-              |
-              v
-    Default experience with pricing + order kits
++----------------------------------------------------------+
+|  HEADER (existing)                                        |
++----------------------------------------------------------+
+|                                                          |
+|  SCAM ALERTS - Protect Yourself from Water Scams         |
+|  ================================================         |
+|                                                          |
+|  [Search scams...]  [All] [Utah] [Texas] [California]    |
+|                     [Door-to-Door] [Phone] [Fake Tests]  |
+|                                                          |
++----------------------------------------------------------+
+|                                                          |
+|  FEATURED ALERT (full width)                             |
+|  +------------------------------------------------------+|
+|  | WARNING: Door-to-Door Water Testing Scams            ||
+|  | How to identify and avoid aggressive sales tactics   ||
+|  | 2.4k views | 847 shares | PINNED                    ||
+|  +------------------------------------------------------+|
+|                                                          |
+|  SCAM FEED (Reddit-style cards)                          |
+|  +--------------------------------------------------+   |
+|  | [^]  Sandy, UT - Health Department Impersonators |   |
+|  | 156  Scammers claiming to be from Health Dept    |   |
+|  | [v]  asking for financial info for water tests   |   |
+|  |      Feb 2019 | Utah | Door-to-Door | Read More->|   |
+|  +--------------------------------------------------+   |
+|                                                          |
+|  +--------------------------------------------------+   |
+|  | [^]  Provo, UT - Utility Payment Scam            |   |
+|  | 89   Fraudsters posing as Provo Power demanding  |   |
+|  | [v]  immediate payment threatening disconnection |   |
+|  |      Sep 2024 | Utah | Phone Scam | Read More -> |   |
+|  +--------------------------------------------------+   |
+|                                                          |
+|  SAFE TESTING CTA                                        |
+|  +------------------------------------------------------+|
+|  | Worried about your water? Get a REAL test.           ||
+|  | [Order Certified Test Kit] [Request Free Test]       ||
+|  +------------------------------------------------------+|
+|                                                          |
++----------------------------------------------------------+
+|  FOOTER (existing)                                        |
++----------------------------------------------------------+
 ```
 
 ---
 
-## What Changes for Utah/Yamily Visitors
+## Scam Articles to Include
 
-| Feature | Default Site | Yamily Mode |
-|---------|-------------|-------------|
-| Pricing on test cards | Shown ($49, $39, etc.) | Hidden |
-| "Add to Cart" button | Shown | Hidden |
-| "Order Kit" button | Shown | Hidden |
-| "Your Local Expert" badge | Not shown | Shown (anonymous branded) |
-| Lead destination | General pool | Zoho CRM via webhook |
-| Language | User choice | Spanish default |
-| Social proof videos | Not shown | Facebook embed carousel |
-| Trust badges | Generic EPA | Puronics + verified badges |
+### Utah-Specific Scams
+
+| Title | Location | Type | Source | Date |
+|-------|----------|------|--------|------|
+| Health Department Impersonators | Sandy, UT | Door-to-Door | Salt Lake Tribune | Feb 2019 |
+| Provo Power Utility Scam | Provo, UT | Phone/Door | Fox 13 | Sep 2024 |
+
+### General Education Articles
+
+| Title | Type | Key Points |
+|-------|------|------------|
+| Door-to-Door Water Testing Scams | Education | Belleville NJ case, $12k systems, aggressive tactics |
+| How to Spot a Scam | Guide | Tablets tests, free tests, government claims |
+| Water Softener Salesman Tactics | Exposed | Survey sheets, demonstrations, price manipulation |
 
 ---
 
 ## Files to Create
 
-### 1. Dealer Context (`src/contexts/DealerContext.tsx`)
-- Detects dealer from URL params, IP, or ZIP
-- Uses free geo-API (ip-api.com) for Utah detection
-- Stores dealer state in sessionStorage
-- Provides `isDealerMode`, `dealer`, and `detectFromZip()` functions
+### 1. Scam Alerts Page (`src/pages/ScamAlerts.tsx`)
 
-### 2. Dealer Data (`src/data/dealerData.ts`)
-- Yamily Acosta profile (branded but anonymous display)
-- Utah ZIP ranges (84001-84791)
-- QR parameter mapping
-- Zoho CRM webhook configuration placeholder
+Main page with:
+- Hero section with warning theme
+- Search bar with real-time filtering
+- Category filter chips (location, scam type)
+- Reddit-style scam cards with voting UI
+- Detail modal or expandable sections
+- CTA section linking to legitimate test kits
 
-### 3. Dealer Expert Card (`src/components/home/DealerExpertCard.tsx`)
-- "Your Local Expert" card (no name/face shown)
-- Trust badges: "Verified", "EPA Certified"
-- "Request Free Test" CTA button
-- Puronics authorized dealer badge
+### 2. Scam Data File (`src/data/scamData.ts`)
 
-### 4. Facebook Video Carousel (`src/components/home/DealerVideos.tsx`)
-- Embedded Facebook reel player
-- Shows Yamily's customer testimonial videos
-- Responsive carousel for mobile
+Contains all scam articles:
+- Sandy Health Department scam
+- Provo utility scam
+- Door-to-door education article (rewritten for CWT)
+- Sales tactics exposure
+- Each with: title, summary, full content, location, date, category, source, vote count
 
-### 5. Utah Water Data (update `src/data/waterQualityData.ts`)
-- Add Salt Lake City, Provo, Ogden, West Valley, Sandy, St. George, Layton, West Jordan ZIPs
-- Utah-specific contaminant profile (hard water, arsenic concerns)
+### 3. Scam Card Component (`src/components/scam-alerts/ScamCard.tsx`)
+
+Reddit-style card:
+- Upvote/downvote buttons (visual only initially)
+- Vote count display
+- Title and preview text
+- Location and category badges
+- Date and source
+- "Read More" expand/link
+
+### 4. Scam Detail Modal (`src/components/scam-alerts/ScamDetailModal.tsx`)
+
+Full article view:
+- Complete scam description
+- Warning signs listed
+- How to report
+- CTA to order test kit
+
+### 5. Scam Search/Filter (`src/components/scam-alerts/ScamFilters.tsx`)
+
+- Search input
+- Category chips (Utah, Phone, Door-to-Door, etc.)
+- Sort options (newest, most votes)
 
 ---
 
 ## Files to Modify
 
-### 1. `src/pages/Index.tsx`
-- Wrap with DealerContext detection
-- Conditionally show DealerExpertCard
-- Suppress popup when from QR (already done, enhance)
+### 1. `src/App.tsx`
+- Add route: `/scam-alerts` -> `ScamAlerts` page
 
-### 2. `src/components/home/WaterTestingServices.tsx`
-- Hide prices when `isDealerMode` is true
-- Hide "Add to Cart" buttons
-- Hide "Order Kit" button
-- Show "Request Free Test" instead
-- Add Yamily's videos section at bottom
-
-### 3. `src/components/LeadCapturePopup.tsx`
-- Add lead source field (hidden, from dealer context)
-- Add webhook call to Zoho CRM endpoint
-- Store locally in DB as backup
-
-### 4. `src/App.tsx`
-- Wrap with DealerProvider
-
-### 5. `src/lib/translations.ts`
-- Add dealer-specific translation keys
+### 2. `src/lib/translations.ts`
+- Add scam-related translation keys
 
 ---
 
-## Database & CRM Integration
+## Scam Content - Rewritten for CWT
 
-### Supabase Tables (to be created)
+### Article 1: "How to Avoid Door-to-Door Water Test Scams" (Featured)
 
-**leads** table:
-- id (uuid)
-- email
-- phone
-- zip
-- dealer_id (nullable)
-- lead_source (e.g., "Lead Source UTAH Yamily ESP")
-- created_at
-- synced_to_crm (boolean)
+This is the educational piece rewritten from the user-provided content, positioning CWT as the safe alternative:
 
-**dealers** table:
-- id (uuid)
-- name (Yamily Acosta)
-- region (Utah)
-- zips_covered (array or range)
-- crm_webhook_url
-- is_active
-- created_at
+**Content:**
+- Warning signs (tablets that change color, government claims, pushy behavior)
+- What to do if approached
+- WQA statement about never soliciting door-to-door
+- CTA: "Order a certified at-home water test kit instead"
 
-### Zoho CRM Integration
+### Article 2: Sandy, UT - Health Department Impersonators
 
-Edge function: `supabase/functions/zoho-webhook/index.ts`
-- Accepts lead data from frontend
-- Posts to Zoho CRM webhook endpoint
-- Stores in Supabase as backup
-- Returns success/failure
+**Summary:** Sandy City warned residents about scammers claiming to be from the Health Department to test water and asking for financial information. This occurred during the 2019 water crisis when high levels of lead, copper, and fluoride were found.
 
-Required secrets:
-- ZOHO_WEBHOOK_URL (Zoho form webhook URL)
+**Key Point:** Neither the city nor health department charges for testing or asks for financial info.
+
+### Article 3: Provo, UT - Utility Scam Alert
+
+**Summary:** Provo Power warned about fraudsters posing as representatives, demanding payment and threatening disconnection. Scams coming through calls, texts, emails, and door-to-door.
+
+**Safety Tips:** Verify employees, never pay via phone, use official website.
+
+### Article 4: Salesman Tactics Exposed
+
+**Summary:** Detailed breakdown of water softener salesman tactics including:
+- Survey sheets to calculate fake savings
+- Beaker tests with rigged demonstrations
+- Precipitation tests that look alarming but show harmless minerals
+- Pressure to buy $6,000-$10,000 systems
 
 ---
 
-## Video Embedding Approach
+## Component Details
 
-Facebook does not allow direct embedding of Reels. Options:
-
-**Option A (Recommended):** Use Facebook's oEmbed API
-- Server-side fetch of embed HTML
-- Display in iframe container
-
-**Option B:** Download videos and host locally
-- Ask Yamily for original video files
-- Upload to project assets
-- Better performance, full control
-
-**Option C:** Link to Facebook
-- Show video thumbnails
-- Open Facebook in new tab when clicked
-
----
-
-## Technical Implementation Details
-
-### Dealer Detection Flow
-
-```typescript
-// In DealerContext
-const detectDealer = async () => {
-  // 1. Check URL params first (highest priority)
-  const params = new URLSearchParams(window.location.search);
-  const leadSource = params.get('source');
-  
-  if (leadSource === 'Lead Source UTAH Yamily ESP' || 
-      leadSource?.includes('UTAH') || 
-      leadSource?.includes('Yamily')) {
-    return setDealer('yamily', 'qr');
-  }
-  
-  // 2. Check IP geolocation
-  try {
-    const res = await fetch('https://ip-api.com/json/?fields=regionName');
-    const data = await res.json();
-    if (data.regionName === 'Utah') {
-      return setDealer('yamily', 'ip');
-    }
-  } catch (e) {
-    console.log('Geo detection failed');
-  }
-  
-  // 3. No dealer - default experience
-  return null;
-};
-```
-
-### Modified Test Cards (Dealer Mode)
-
-```tsx
-// WaterTestingServices.tsx - conditional rendering
-{!isDealerMode && (
-  <>
-    <p className="text-2xl font-bold">{test.price}</p>
-    <Button>Add to Cart</Button>
-  </>
-)}
-{isDealerMode && (
-  <Button variant="secondary">
-    Learn More
-  </Button>
-)}
-```
-
----
-
-## Utah ZIP Codes to Add
-
-| City | ZIP Range | Population Focus |
-|------|-----------|------------------|
-| Salt Lake City | 84101-84199 | Primary metro |
-| Provo | 84601-84606 | University area |
-| Ogden | 84401-84415 | Northern Utah |
-| West Valley City | 84119-84120 | Suburban |
-| Sandy | 84070, 84092 | Family suburbs |
-| St. George | 84770-84791 | Southern Utah |
-| Layton | 84041 | Davis County |
-| West Jordan | 84084, 84088 | Salt Lake suburb |
-| Orem | 84057-84059 | Utah County |
-| Lehi | 84043 | Tech corridor |
-
----
-
-## QR Code Link Format
-
-Yamily will use this exact URL for her QR codes:
+### ScamCard Design
 
 ```text
-https://communitywatertestusa.com?source=Lead%20Source%20UTAH%20Yamily%20ESP
++-------------------------------------------------------+
+| [^]  SANDY, UT - Health Department Impersonators      |
+| 156  -----------------------------------------------  |
+| [v]                                                   |
+|      Scammers claiming to be from Health Dept asking  |
+|      for financial info during water crisis...        |
+|                                                       |
+|      [Utah] [Door-to-Door] [2019]                    |
+|                                                       |
+|      Source: Salt Lake Tribune    [Read Full Story]  |
++-------------------------------------------------------+
 ```
 
-Optional campaign tracking:
-```text
-https://communitywatertestusa.com?source=Lead%20Source%20UTAH%20Yamily%20ESP&campaign_id=door-hanger-feb
-```
+### Color Coding by Category
+
+| Category | Color |
+|----------|-------|
+| Utah | Blue badge |
+| Door-to-Door | Red/warning badge |
+| Phone Scam | Orange badge |
+| Fake Tests | Purple badge |
+| Education | Green badge |
 
 ---
 
-## Admin Dashboard (Future Phase)
+## Search Functionality
 
-Once Supabase is connected, build:
+The search will filter scam cards by:
+- Title text
+- Description text
+- Location
+- Category tags
 
-1. **Dealer Management**
-   - Add/remove dealers
-   - Set coverage areas by ZIP
-   - Enable/disable dealer status
-
-2. **Lead Tracking**
-   - View all leads by dealer
-   - Filter by date, source, status
-   - Export to CSV
-
-3. **SEO Territory Management**
-   - Mark cities as "purchased" by dealer
-   - Enable SEO content only for purchased territories
-   - Track which ZIPs drive traffic
+Real-time filtering as user types.
 
 ---
 
 ## Implementation Order
 
-1. **Enable Supabase/Lovable Cloud** - Required for database + CRM webhook
-2. Create dealer data file with Yamily's info
-3. Create DealerContext with detection logic
-4. Add Utah ZIPs to water quality data
-5. Create DealerExpertCard component (anonymous branded)
-6. Modify WaterTestingServices for dealer mode
-7. Update LeadCapturePopup with CRM webhook
-8. Create video section (thumbnails linking to Facebook initially)
-9. Add Zoho webhook edge function
-10. Test full flow with QR parameter
+1. Create `src/data/scamData.ts` with all scam articles
+2. Create `src/components/scam-alerts/ScamCard.tsx`
+3. Create `src/components/scam-alerts/ScamFilters.tsx`
+4. Create `src/components/scam-alerts/ScamDetailModal.tsx`
+5. Create `src/pages/ScamAlerts.tsx` (main page)
+6. Update `src/App.tsx` with new route
+7. Update `src/lib/translations.ts` with scam translation keys
 
 ---
 
-## Assets Needed from You
+## CTA Integration
 
-Before implementation, please provide:
+Every scam article ends with:
 
-1. **Zoho CRM Webhook URL** - The endpoint where leads should be sent
-2. **Yamily's business contact info** (for backend routing, not public display):
-   - Phone number
-   - Email address
-3. **Video hosting decision** - Should we link to Facebook or host videos locally?
-4. **Profile image selection** - Which of the uploaded photos should be used for testimonials/trust building?
+**"Worried about your water? Here's how to safely test:"**
+1. Order an at-home water test kit (link to your kits)
+2. Request a free test from a certified expert (dealer CTA)
+
+This positions CWT as the trustworthy alternative to scammers.
 
 ---
 
-## Security Considerations
+## Technical Notes
 
-- Dealer info stored in frontend is non-sensitive (no personal contact exposed)
-- Lead data sent to Supabase with RLS policies
-- Zoho webhook called server-side only (edge function)
-- No API keys exposed in frontend code
+- Voting is visual-only initially (no backend)
+- Search uses client-side filtering (fast, no API)
+- Modal stays in-site (no external navigation)
+- Responsive: cards stack on mobile
+- Language support via translations file
+- Dealer mode: "Free Test" CTA shows instead of "Order Kit"
+
+---
+
+## Bilingual Content
+
+All scam articles will have Spanish translations:
+- "Alertas de Estafas"
+- "Como Evitar Estafas de Pruebas de Agua Puerta a Puerta"
+- All summaries and full articles in both languages
 
