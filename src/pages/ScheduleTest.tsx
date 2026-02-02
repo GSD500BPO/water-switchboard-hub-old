@@ -4,13 +4,12 @@ import { ZohoFormEmbed } from "@/components/ZohoFormEmbed";
 import { Card, CardContent } from "@/components/ui/card";
 import { CheckCircle, Shield, Clock, Users } from "lucide-react";
 import { useLanguage } from "@/contexts/LanguageContext";
-import { useDealer } from "@/contexts/DealerContext";
+
 import cwtLogo from "@/assets/cwt-logo.png";
 import yamilyPhoto from "@/assets/yamily-acosta.png";
 
 export default function ScheduleTest() {
   const { language } = useLanguage();
-  const { dealer, isDealerMode } = useDealer();
 
   const benefits = [
     {
@@ -90,43 +89,41 @@ export default function ScheduleTest() {
 
               {/* Water Specialist Section */}
               <div className="space-y-6">
-                {/* Yamily Card - shown for Utah dealer mode */}
-                {isDealerMode && dealer?.id === "yamily-acosta" && (
-                  <Card className="border-secondary/30 bg-gradient-to-br from-card to-secondary/5">
-                    <CardContent className="p-6">
-                      <div className="flex items-start gap-4">
-                        <img 
-                          src={yamilyPhoto} 
-                          alt="Yamily Acosta" 
-                          className="w-24 h-24 rounded-full object-cover border-4 border-secondary/20"
-                        />
-                        <div className="flex-1">
-                          <div className="flex items-center gap-2 mb-1">
-                            <span className="text-xs bg-secondary/20 text-secondary px-2 py-0.5 rounded-full font-medium">
-                              {language === "es" ? "Especialista del Mes" : "Specialist of the Month"}
-                            </span>
-                          </div>
-                          <h3 className="text-xl font-bold text-foreground">Yamily Acosta</h3>
-                          <p className="text-sm text-muted-foreground mb-2">
-                            {language === "es" ? "Salt Lake City, Utah" : "Salt Lake City, Utah"}
-                          </p>
-                          <p className="text-sm text-foreground/80">
-                            {language === "es"
-                              ? "Técnica certificada EPA con más de 5 años de experiencia ayudando a familias en Utah a entender y mejorar su calidad de agua."
-                              : "EPA certified technician with 5+ years of experience helping Utah families understand and improve their water quality."
-                            }
-                          </p>
-                          <div className="flex items-center gap-2 mt-3">
-                            <img src={cwtLogo} alt="CWT" className="h-5 w-auto" />
-                            <span className="text-xs text-green-600 font-medium">
-                              {language === "es" ? "Verificada EPA + Antecedentes" : "EPA + Background Verified"}
-                            </span>
-                          </div>
-                        </div>
+              {/* Featured Water Specialist - Always shown */}
+              <Card className="border-secondary/30 bg-gradient-to-br from-card to-secondary/5">
+                <CardContent className="p-6">
+                  <div className="flex items-start gap-4">
+                    <img 
+                      src={yamilyPhoto} 
+                      alt="Yamily Acosta" 
+                      className="w-24 h-24 rounded-full object-cover border-4 border-secondary/20"
+                    />
+                    <div className="flex-1">
+                      <div className="flex items-center gap-2 mb-1">
+                        <span className="text-xs bg-secondary/20 text-secondary px-2 py-0.5 rounded-full font-medium">
+                          {language === "es" ? "Especialista del Mes" : "Specialist of the Month"}
+                        </span>
                       </div>
-                    </CardContent>
-                  </Card>
-                )}
+                      <h3 className="text-xl font-bold text-foreground">Yamily Acosta</h3>
+                      <p className="text-sm text-muted-foreground mb-2">
+                        {language === "es" ? "Salt Lake City, Utah" : "Salt Lake City, Utah"}
+                      </p>
+                      <p className="text-sm text-foreground/80">
+                        {language === "es"
+                          ? "Técnica certificada EPA con más de 5 años de experiencia ayudando a familias en Utah a entender y mejorar su calidad de agua."
+                          : "EPA certified technician with 5+ years of experience helping Utah families understand and improve their water quality."
+                        }
+                      </p>
+                      <div className="flex items-center gap-2 mt-3">
+                        <img src={cwtLogo} alt="CWT" className="h-5 w-auto" />
+                        <span className="text-xs text-green-600 font-medium">
+                          {language === "es" ? "Verificada EPA + Antecedentes" : "EPA + Background Verified"}
+                        </span>
+                      </div>
+                    </div>
+                  </div>
+                </CardContent>
+              </Card>
 
                 {/* Benefits */}
                 <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
