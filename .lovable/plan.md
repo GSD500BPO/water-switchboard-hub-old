@@ -1,132 +1,313 @@
 
 
-# Real Water Quality Data Integration Plan
+# Utah Dealer System - Yamily Acosta Implementation
 
-## Current Situation
+## Overview
 
-The water quality information displayed on the ZIP results page (`/water-quality/:zip`) comes from **hardcoded mock data** in `src/pages/WaterQuality.tsx` (lines 16-31). This mock data shows the same results (Lead, Chlorine, PFAS, Arsenic, Nitrate for Beverly Hills, CA) regardless of which ZIP code is entered.
-
-Additionally, clicking "Learn More" on any test card navigates to `/tests/:id` which currently shows a 404 page.
+This plan creates a dynamic dealer detection system that identifies visitors from Utah (via QR code, IP geo-location, or ZIP code) and shows them a customized "branded but anonymous" experience with lead routing to Yamily Acosta through Zoho CRM.
 
 ---
 
-## What We Will Build
-
-### Part 1: Expanded Mock Data System (Immediate)
-Create a comprehensive local database of water quality data for major US cities/ZIPs that can be queried client-side. This allows the site to function with realistic-looking data while we work on real data integration.
-
-### Part 2: Test Detail Pages
-Create the missing `/tests/:id` pages so users can learn more about each water test type.
-
-### Part 3: Real Data Integration Path (Future)
-Prepare the architecture for connecting to real water quality sources.
-
----
-
-## Technical Implementation
-
-### 1. Water Quality Data File
-
-Create `src/data/waterQualityData.ts` with:
-
-- ZIP code to city/state mapping for 100+ major metros
-- Region-based contaminant profiles (Northeast, Southeast, Midwest, Southwest, West Coast)
-- Common contaminants with realistic ranges:
-  - Lead (ppb) - varies by infrastructure age
-  - Chlorine (ppm) - municipal treatment levels
-  - PFAS (ppt) - industrial proximity
-  - Arsenic (ppb) - geological factors
-  - Nitrate (ppm) - agricultural areas
-  - Fluoride (ppm) - added by utilities
-  - Chromium-6 (ppb) - industrial areas
-  - Hardness (gpg) - mineral content
+## Key Business Logic
 
 ```text
-Structure:
-zipToCity: { "90210": { city: "Beverly Hills", state: "CA", region: "west" } }
-regionProfiles: { "west": { contaminants: [...], sourceType: "Municipal", hardness: "Moderate" } }
+Visitor arrives at communitywatertestusa.com
+              |
+              v
+    Has URL param "Lead Source UTAH Yamily ESP"?
+              |
+         YES -+-> Set dealer mode = Yamily
+              |   - Skip lead capture popup
+              |   - Track QR scan attribution
+              |
+             NO
+              |
+              v
+    Is visitor IP from Utah? (geo-detection API)
+              |
+         YES -+-> Set dealer mode = Yamily
+              |   - Show lead capture popup (collect info)
+              |
+             NO
+              |
+              v
+    User enters Utah ZIP (84xxx)?
+              |
+         YES -+-> Set dealer mode = Yamily
+              |
+             NO
+              |
+              v
+    Default experience with pricing + order kits
 ```
 
-### 2. Update WaterQuality.tsx
+---
 
-- Import the data lookup functions
-- Query by ZIP code on page load
-- If ZIP not found, show regional average based on state
-- Add "Data Disclaimer" section explaining sources
-- Add loading state while data is being processed
+## What Changes for Utah/Yamily Visitors
 
-### 3. Create Test Detail Pages
-
-Create `src/pages/TestDetail.tsx` with:
-
-- Dynamic route: `/tests/:testId`
-- Full description of each test type
-- What the test detects
-- When you should get this test
-- Sample collection instructions
-- Pricing and ordering CTA
-- FAQ section specific to that test
-
-### 4. Real Data Sources (Future Architecture)
-
-When ready to integrate real data, options include:
-
-| Source | Method | Data Type |
-|--------|--------|-----------|
-| EPA SDWIS | Public API | Violations, utility reports |
-| EWG Tap Water Database | Firecrawl scraping | Comprehensive contaminant data |
-| State Health Departments | Manual data entry | Local advisories |
-| Local Utility CCRs | Firecrawl scraping | Annual water reports |
+| Feature | Default Site | Yamily Mode |
+|---------|-------------|-------------|
+| Pricing on test cards | Shown ($49, $39, etc.) | Hidden |
+| "Add to Cart" button | Shown | Hidden |
+| "Order Kit" button | Shown | Hidden |
+| "Your Local Expert" badge | Not shown | Shown (anonymous branded) |
+| Lead destination | General pool | Zoho CRM via webhook |
+| Language | User choice | Spanish default |
+| Social proof videos | Not shown | Facebook embed carousel |
+| Trust badges | Generic EPA | Puronics + verified badges |
 
 ---
 
-## Files to Create/Modify
+## Files to Create
 
-| File | Action | Purpose |
-|------|--------|---------|
-| `src/data/waterQualityData.ts` | Create | ZIP lookup database with 100+ cities |
-| `src/pages/WaterQuality.tsx` | Modify | Use data lookup instead of hardcoded mock |
-| `src/pages/TestDetail.tsx` | Create | Individual test type detail pages |
-| `src/App.tsx` | Modify | Add `/tests/:testId` route |
-| `src/lib/translations.ts` | Modify | Add test detail page translations |
+### 1. Dealer Context (`src/contexts/DealerContext.tsx`)
+- Detects dealer from URL params, IP, or ZIP
+- Uses free geo-API (ip-api.com) for Utah detection
+- Stores dealer state in sessionStorage
+- Provides `isDealerMode`, `dealer`, and `detectFromZip()` functions
 
----
+### 2. Dealer Data (`src/data/dealerData.ts`)
+- Yamily Acosta profile (branded but anonymous display)
+- Utah ZIP ranges (84001-84791)
+- QR parameter mapping
+- Zoho CRM webhook configuration placeholder
 
-## Data Coverage
+### 3. Dealer Expert Card (`src/components/home/DealerExpertCard.tsx`)
+- "Your Local Expert" card (no name/face shown)
+- Trust badges: "Verified", "EPA Certified"
+- "Request Free Test" CTA button
+- Puronics authorized dealer badge
 
-Initial mock data will cover major metros including:
+### 4. Facebook Video Carousel (`src/components/home/DealerVideos.tsx`)
+- Embedded Facebook reel player
+- Shows Yamily's customer testimonial videos
+- Responsive carousel for mobile
 
-- **California**: Los Angeles, San Francisco, San Diego, Sacramento
-- **Texas**: Houston, Dallas, Austin, San Antonio
-- **Florida**: Miami, Tampa, Orlando, Jacksonville
-- **New York**: NYC, Buffalo, Albany
-- **Other**: Chicago, Phoenix, Denver, Seattle, Boston, Atlanta, Detroit, Philadelphia
-
-Each region will have distinct contaminant profiles based on real-world patterns:
-- Older cities (Northeast): Higher lead risk
-- Agricultural areas (Midwest): Higher nitrates
-- Industrial areas: PFAS concerns
-- Western states: Hard water, arsenic
-
----
-
-## User Experience Flow
-
-1. User enters ZIP on homepage
-2. System looks up ZIP in local database
-3. If found: Show city-specific data with accurate contaminant levels
-4. If not found: Show state/regional average with note "Based on regional data - your local water may vary"
-5. All pages show disclaimer: "Data compiled from EPA reports, utility disclosures, and community testing. Request a free test for your specific home."
+### 5. Utah Water Data (update `src/data/waterQualityData.ts`)
+- Add Salt Lake City, Provo, Ogden, West Valley, Sandy, St. George, Layton, West Jordan ZIPs
+- Utah-specific contaminant profile (hard water, arsenic concerns)
 
 ---
 
-## Next Phase: Real Data Integration
+## Files to Modify
 
-Once Lovable Cloud/Supabase is enabled:
+### 1. `src/pages/Index.tsx`
+- Wrap with DealerContext detection
+- Conditionally show DealerExpertCard
+- Suppress popup when from QR (already done, enhance)
 
-1. Create `water_quality_data` table in database
-2. Build Firecrawl edge function to scrape EWG data
-3. Store and index by ZIP code
-4. Update frontend to query API instead of local data
-5. Add admin interface to manage/update data
+### 2. `src/components/home/WaterTestingServices.tsx`
+- Hide prices when `isDealerMode` is true
+- Hide "Add to Cart" buttons
+- Hide "Order Kit" button
+- Show "Request Free Test" instead
+- Add Yamily's videos section at bottom
+
+### 3. `src/components/LeadCapturePopup.tsx`
+- Add lead source field (hidden, from dealer context)
+- Add webhook call to Zoho CRM endpoint
+- Store locally in DB as backup
+
+### 4. `src/App.tsx`
+- Wrap with DealerProvider
+
+### 5. `src/lib/translations.ts`
+- Add dealer-specific translation keys
+
+---
+
+## Database & CRM Integration
+
+### Supabase Tables (to be created)
+
+**leads** table:
+- id (uuid)
+- email
+- phone
+- zip
+- dealer_id (nullable)
+- lead_source (e.g., "Lead Source UTAH Yamily ESP")
+- created_at
+- synced_to_crm (boolean)
+
+**dealers** table:
+- id (uuid)
+- name (Yamily Acosta)
+- region (Utah)
+- zips_covered (array or range)
+- crm_webhook_url
+- is_active
+- created_at
+
+### Zoho CRM Integration
+
+Edge function: `supabase/functions/zoho-webhook/index.ts`
+- Accepts lead data from frontend
+- Posts to Zoho CRM webhook endpoint
+- Stores in Supabase as backup
+- Returns success/failure
+
+Required secrets:
+- ZOHO_WEBHOOK_URL (Zoho form webhook URL)
+
+---
+
+## Video Embedding Approach
+
+Facebook does not allow direct embedding of Reels. Options:
+
+**Option A (Recommended):** Use Facebook's oEmbed API
+- Server-side fetch of embed HTML
+- Display in iframe container
+
+**Option B:** Download videos and host locally
+- Ask Yamily for original video files
+- Upload to project assets
+- Better performance, full control
+
+**Option C:** Link to Facebook
+- Show video thumbnails
+- Open Facebook in new tab when clicked
+
+---
+
+## Technical Implementation Details
+
+### Dealer Detection Flow
+
+```typescript
+// In DealerContext
+const detectDealer = async () => {
+  // 1. Check URL params first (highest priority)
+  const params = new URLSearchParams(window.location.search);
+  const leadSource = params.get('source');
+  
+  if (leadSource === 'Lead Source UTAH Yamily ESP' || 
+      leadSource?.includes('UTAH') || 
+      leadSource?.includes('Yamily')) {
+    return setDealer('yamily', 'qr');
+  }
+  
+  // 2. Check IP geolocation
+  try {
+    const res = await fetch('https://ip-api.com/json/?fields=regionName');
+    const data = await res.json();
+    if (data.regionName === 'Utah') {
+      return setDealer('yamily', 'ip');
+    }
+  } catch (e) {
+    console.log('Geo detection failed');
+  }
+  
+  // 3. No dealer - default experience
+  return null;
+};
+```
+
+### Modified Test Cards (Dealer Mode)
+
+```tsx
+// WaterTestingServices.tsx - conditional rendering
+{!isDealerMode && (
+  <>
+    <p className="text-2xl font-bold">{test.price}</p>
+    <Button>Add to Cart</Button>
+  </>
+)}
+{isDealerMode && (
+  <Button variant="secondary">
+    Learn More
+  </Button>
+)}
+```
+
+---
+
+## Utah ZIP Codes to Add
+
+| City | ZIP Range | Population Focus |
+|------|-----------|------------------|
+| Salt Lake City | 84101-84199 | Primary metro |
+| Provo | 84601-84606 | University area |
+| Ogden | 84401-84415 | Northern Utah |
+| West Valley City | 84119-84120 | Suburban |
+| Sandy | 84070, 84092 | Family suburbs |
+| St. George | 84770-84791 | Southern Utah |
+| Layton | 84041 | Davis County |
+| West Jordan | 84084, 84088 | Salt Lake suburb |
+| Orem | 84057-84059 | Utah County |
+| Lehi | 84043 | Tech corridor |
+
+---
+
+## QR Code Link Format
+
+Yamily will use this exact URL for her QR codes:
+
+```text
+https://communitywatertestusa.com?source=Lead%20Source%20UTAH%20Yamily%20ESP
+```
+
+Optional campaign tracking:
+```text
+https://communitywatertestusa.com?source=Lead%20Source%20UTAH%20Yamily%20ESP&campaign_id=door-hanger-feb
+```
+
+---
+
+## Admin Dashboard (Future Phase)
+
+Once Supabase is connected, build:
+
+1. **Dealer Management**
+   - Add/remove dealers
+   - Set coverage areas by ZIP
+   - Enable/disable dealer status
+
+2. **Lead Tracking**
+   - View all leads by dealer
+   - Filter by date, source, status
+   - Export to CSV
+
+3. **SEO Territory Management**
+   - Mark cities as "purchased" by dealer
+   - Enable SEO content only for purchased territories
+   - Track which ZIPs drive traffic
+
+---
+
+## Implementation Order
+
+1. **Enable Supabase/Lovable Cloud** - Required for database + CRM webhook
+2. Create dealer data file with Yamily's info
+3. Create DealerContext with detection logic
+4. Add Utah ZIPs to water quality data
+5. Create DealerExpertCard component (anonymous branded)
+6. Modify WaterTestingServices for dealer mode
+7. Update LeadCapturePopup with CRM webhook
+8. Create video section (thumbnails linking to Facebook initially)
+9. Add Zoho webhook edge function
+10. Test full flow with QR parameter
+
+---
+
+## Assets Needed from You
+
+Before implementation, please provide:
+
+1. **Zoho CRM Webhook URL** - The endpoint where leads should be sent
+2. **Yamily's business contact info** (for backend routing, not public display):
+   - Phone number
+   - Email address
+3. **Video hosting decision** - Should we link to Facebook or host videos locally?
+4. **Profile image selection** - Which of the uploaded photos should be used for testimonials/trust building?
+
+---
+
+## Security Considerations
+
+- Dealer info stored in frontend is non-sensitive (no personal contact exposed)
+- Lead data sent to Supabase with RLS policies
+- Zoho webhook called server-side only (edge function)
+- No API keys exposed in frontend code
 
