@@ -6,8 +6,7 @@ export function Footer() {
   const { t } = useLanguage();
 
   const quickLinks = [
-    { href: "/water-testing", label: t("nav.waterTesting") },
-    { href: "/filters", label: t("nav.filters") },
+    { href: "/schedule-test", label: t("nav.waterTesting") },
     { href: "/scam-alerts", label: t("nav.scamAlerts") },
   ];
 
