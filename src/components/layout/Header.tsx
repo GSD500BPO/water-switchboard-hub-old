@@ -15,10 +15,8 @@ export function Header() {
   const { language, setLanguage, t } = useLanguage();
 
   const navLinks = [
-    { href: "/water-testing", label: t("nav.waterTesting") },
-    { href: "/filters", label: t("nav.filters") },
+    { href: "/schedule-test", label: t("nav.waterTesting") },
     { href: "/scam-alerts", label: t("nav.scamAlerts") },
-    { href: "/about", label: t("nav.about") },
   ];
 
   const toggleLanguage = () => {

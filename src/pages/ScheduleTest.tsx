@@ -91,36 +91,28 @@ export default function ScheduleTest() {
               <div className="space-y-6">
               {/* Featured Water Specialist - Always shown */}
               <Card className="border-secondary/30 bg-gradient-to-br from-card to-secondary/5">
-                <CardContent className="p-6">
-                  <div className="flex items-start gap-4">
-                    <img 
-                      src={yamilyPhoto} 
-                      alt="Yamily Acosta" 
-                      className="w-24 h-24 rounded-full object-cover border-4 border-secondary/20"
-                    />
-                    <div className="flex-1">
-                      <div className="flex items-center gap-2 mb-1">
-                        <span className="text-xs bg-secondary/20 text-secondary px-2 py-0.5 rounded-full font-medium">
-                          {language === "es" ? "Especialista del Mes" : "Specialist of the Month"}
-                        </span>
-                      </div>
-                      <h3 className="text-xl font-bold text-foreground">Yamily Acosta</h3>
-                      <p className="text-sm text-muted-foreground mb-2">
-                        {language === "es" ? "Salt Lake City, Utah" : "Salt Lake City, Utah"}
-                      </p>
-                      <p className="text-sm text-foreground/80">
-                        {language === "es"
-                          ? "Técnica certificada EPA con más de 5 años de experiencia ayudando a familias en Utah a entender y mejorar su calidad de agua."
-                          : "EPA certified technician with 5+ years of experience helping Utah families understand and improve their water quality."
-                        }
-                      </p>
-                      <div className="flex items-center gap-2 mt-3">
-                        <img src={cwtLogo} alt="CWT" className="h-5 w-auto" />
-                        <span className="text-xs text-green-600 font-medium">
-                          {language === "es" ? "Verificada EPA + Antecedentes" : "EPA + Background Verified"}
-                        </span>
-                      </div>
-                    </div>
+                <CardContent className="p-6 flex flex-col items-center text-center">
+                  <span className="text-xs bg-secondary/20 text-secondary px-3 py-1 rounded-full font-medium mb-4">
+                    {language === "es" ? "⭐ Especialista del Mes" : "⭐ Specialist of the Month"}
+                  </span>
+                  <img 
+                    src={yamilyPhoto} 
+                    alt="Yamily Acosta" 
+                    className="w-40 h-40 md:w-48 md:h-48 rounded-full object-cover border-4 border-secondary/30 shadow-lg mb-4"
+                  />
+                  <h3 className="text-xl font-bold text-foreground">Yamily Acosta</h3>
+                  <p className="text-sm text-muted-foreground mb-3">Salt Lake City, Utah</p>
+                  <p className="text-sm text-foreground/80 max-w-sm">
+                    {language === "es"
+                      ? "Técnica certificada EPA con más de 5 años de experiencia ayudando a familias en Utah a entender y mejorar su calidad de agua."
+                      : "EPA certified technician with 5+ years of experience helping Utah families understand and improve their water quality."
+                    }
+                  </p>
+                  <div className="flex items-center gap-2 mt-4">
+                    <img src={cwtLogo} alt="CWT" className="h-5 w-auto" />
+                    <span className="text-xs text-green-600 font-medium">
+                      {language === "es" ? "Verificada EPA + Antecedentes" : "EPA + Background Verified"}
+                    </span>
                   </div>
                 </CardContent>
               </Card>
