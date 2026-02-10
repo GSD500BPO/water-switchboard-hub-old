@@ -1,90 +1,34 @@
 
 
-# Fix: Remove Dead Nav Links + Make Yamily's Photo Big
+# Fix Footer Logo + Update Favicon
 
-## What's Wrong
-
-1. **"Filtros" and "Acerca de"** are in the header and footer navigation but go nowhere useful (redirect to homepage). They need to be removed entirely.
-2. **Yamily's photo is tiny** -- it's only 96x96 pixels (w-24 h-24). The card layout puts her photo as a small circle next to text. It needs to be a **large, prominent feature** so visitors immediately see their water specialist.
+## Problem
+The footer logo shows as a **white square** because the CSS filter `brightness-0 invert` is blanking out the uploaded CWT logo image. The favicon also still shows the default Lovable icon.
 
 ## Changes
 
-### 1. Remove "Filtros" and "Acerca de" from Header Navigation
-**File: `src/components/layout/Header.tsx`**
+### 1. Copy the CWT logo for the favicon
+- Copy `user-uploads://image-19.png` to `public/favicon.png` (for the favicon, needs to be in public/)
 
-Remove these two items from the `navLinks` array (lines 17-22):
+### 2. Update the favicon in `index.html`
+- Replace the default `<link rel="icon" href="/favicon.ico">` with `<link rel="icon" href="/favicon.png" type="image/png">`
+- Also update the page title from "Lovable App" to "Community Water Test"
 
-**Before:**
-```
-navLinks = [
-  { href: "/water-testing", label: t("nav.waterTesting") },
-  { href: "/filters", label: t("nav.filters") },
-  { href: "/scam-alerts", label: t("nav.scamAlerts") },
-  { href: "/about", label: t("nav.about") },
-];
-```
+### 3. Fix the footer logo in `src/components/layout/Footer.tsx`
+- Remove the `brightness-0 invert` CSS filter that's turning the logo into a white square
+- The logo should display naturally against the dark navy footer background
+- Keep the size at `h-24 md:h-32`
 
-**After:**
+**Line 29 change:**
 ```
-navLinks = [
-  { href: "/schedule-test", label: t("nav.waterTesting") },
-  { href: "/scam-alerts", label: t("nav.scamAlerts") },
-];
+Before: className="h-24 md:h-32 w-auto brightness-0 invert"
+After:  className="h-24 md:h-32 w-auto"
 ```
 
-This also fixes "Pruebas de Agua" / "Water Testing" to link directly to `/schedule-test` instead of `/water-testing` (which just redirects anyway).
-
----
-
-### 2. Clean Up Footer Links
-**File: `src/components/layout/Footer.tsx`**
-
-Remove "Filtros" from the quick links (lines 8-12):
-
-**Before:**
-```
-quickLinks = [
-  { href: "/water-testing", label: t("nav.waterTesting") },
-  { href: "/filters", label: t("nav.filters") },
-  { href: "/scam-alerts", label: t("nav.scamAlerts") },
-];
-```
-
-**After:**
-```
-quickLinks = [
-  { href: "/schedule-test", label: t("nav.waterTesting") },
-  { href: "/scam-alerts", label: t("nav.scamAlerts") },
-];
-```
-
----
-
-### 3. Make Yamily's Photo Big and Prominent
-**File: `src/pages/ScheduleTest.tsx`**
-
-Redesign the Yamily card from a small inline layout to a **large featured section** with a big photo:
-
-- Change from `w-24 h-24` (96px) to `w-40 h-40 md:w-48 md:h-48` (160-192px)
-- Stack layout vertically: big photo on top, centered, with name/bio below
-- Add the "Specialist of the Month" badge prominently
-- Keep the CWT logo badge and EPA verification
-
-The card will go from a small side-by-side design to a centered, eye-catching feature card that makes Yamily the focal point of the right column.
-
----
-
-## Technical Details
-
-### Files Modified
+## Files Modified
 | File | Change |
 |------|--------|
-| `src/components/layout/Header.tsx` | Remove "Filtros" and "Acerca de" nav links, fix Water Testing href |
-| `src/components/layout/Footer.tsx` | Remove "Filtros" from quick links, fix Water Testing href |
-| `src/pages/ScheduleTest.tsx` | Redesign Yamily card with large centered photo |
+| `public/favicon.png` | New file - CWT logo for favicon |
+| `index.html` | Update favicon reference + page title |
+| `src/components/layout/Footer.tsx` | Remove `brightness-0 invert` filter from logo |
 
-### Result After Fix
-- Navigation only shows: Water Testing + Scam Alerts + CTA button
-- No more dead links in header or footer
-- Yamily's photo displays large and centered on the Schedule Test page
-- Works in both English and Spanish
