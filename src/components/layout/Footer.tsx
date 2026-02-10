@@ -26,7 +26,7 @@ export function Footer() {
               <img 
                 src={cwtLogo} 
                 alt="Community Water Test" 
-                className="h-24 md:h-32 w-auto brightness-0 invert" 
+                className="h-24 md:h-32 w-auto" 
               />
             </Link>
             <p className="text-primary-foreground/80 text-sm max-w-md">
