@@ -1,34 +1,75 @@
 
 
-# Fix Footer Logo + Update Favicon
+# Fix Favicon + Update Title + Transform Popup into Free eBook Offer
 
 ## Problem
-The footer logo shows as a **white square** because the CSS filter `brightness-0 invert` is blanking out the uploaded CWT logo image. The favicon also still shows the default Lovable icon.
+1. The browser tab still shows "Lovable App" with the old favicon because the old `favicon.ico` file still exists in `public/` and browsers cache it aggressively. Need to remove it and ensure only our CWT logo PNG is used.
+2. Title needs to be "CWT - Community Water Test ORG"
+3. The lead capture popup currently just says "Get free information" -- it needs to be transformed into a compelling **free eBook offer** that gives visitors a reason to fill out the form.
 
 ## Changes
 
-### 1. Copy the CWT logo for the favicon
-- Copy `user-uploads://image-19.png` to `public/favicon.png` (for the favicon, needs to be in public/)
+### 1. Fix Favicon (remove old file + update HTML)
+- **Delete** `public/favicon.ico` (the old Lovable favicon that browsers keep picking up)
+- **Update `index.html`**: Change title to "CWT - Community Water Test ORG", remove old favicon.ico reference, clean up remaining Lovable references in meta tags
 
-### 2. Update the favicon in `index.html`
-- Replace the default `<link rel="icon" href="/favicon.ico">` with `<link rel="icon" href="/favicon.png" type="image/png">`
-- Also update the page title from "Lovable App" to "Community Water Test"
+### 2. Transform Lead Capture Popup into Free eBook Offer
+**File: `src/components/LeadCapturePopup.tsx`**
 
-### 3. Fix the footer logo in `src/components/layout/Footer.tsx`
-- Remove the `brightness-0 invert` CSS filter that's turning the logo into a white square
-- The logo should display naturally against the dark navy footer background
-- Keep the size at `h-24 md:h-32`
+Redesign the popup to offer a **free eBook**: "The Homeowner's Guide to Water Quality" (EN) / "Guia del Propietario sobre la Calidad del Agua" (ES)
 
-**Line 29 change:**
-```
-Before: className="h-24 md:h-32 w-auto brightness-0 invert"
-After:  className="h-24 md:h-32 w-auto"
-```
+The eBook concept:
+- Title: "What's Really In Your Water? The Complete Homeowner's Guide"
+- Covers: Common contaminants (Lead, PFAS, Arsenic, THMs), how to read your water report, EPA safe limits explained, signs your water needs testing, regional water quality patterns
+- This positions CWT as an authority and gives a real incentive to share contact info
 
-## Files Modified
+The popup will show:
+- Left side: eBook cover mockup (styled with CSS, no actual PDF needed yet)
+- Right side: Form with headline "Get Your FREE Water Quality eBook"
+- Fields: Name, Email, ZIP code, Phone (optional)
+- Added a Name field since you're emailing them the eBook
+- CTA: "Send Me The Free Guide" / "Enviarme La Guia Gratis"
+
+### 3. Update Translations
+**File: `src/lib/translations.ts`**
+
+Add/update popup translation keys:
+- `popup.title` -> "Get Your FREE Water Quality Guide"
+- `popup.subtitle` -> "Learn what contaminants are in your tap water and how to protect your family. Download our comprehensive guide."
+- `popup.cta` -> "Send Me The Free Guide"
+- `popup.namePlaceholder` -> "Full Name*"
+- Add new key `popup.ebookTitle` -> "What's Really In Your Water?"
+- Add new key `popup.ebookSubtitle` -> "The Complete Homeowner's Guide"
+- Same for Spanish translations
+
+### Data the Form Collects
+When someone fills out the form, you'll capture:
+| Field | Required | Purpose |
+|-------|----------|---------|
+| Full Name | Yes | Personalize emails + CRM contact |
+| Email | Yes | Send the eBook + follow-up nurture |
+| ZIP Code | Yes | Match to local water data + assign dealer |
+| Phone | No | For dealer follow-up calls |
+| Dealer ID | Auto | Attribution tracking |
+| Lead Source | Auto | "eBook Download" or "Dealer: [name]" |
+| Detection Source | Auto | How they found the site (QR, organic, etc.) |
+| Timestamp | Auto | When they submitted |
+
+This data gets logged and stored for future integration with your CRM (Zoho).
+
+## Technical Details
+
+### Files Modified
 | File | Change |
 |------|--------|
-| `public/favicon.png` | New file - CWT logo for favicon |
-| `index.html` | Update favicon reference + page title |
-| `src/components/layout/Footer.tsx` | Remove `brightness-0 invert` filter from logo |
+| `public/favicon.ico` | DELETE this file |
+| `index.html` | Title to "CWT - Community Water Test ORG", clean up Lovable meta tags |
+| `src/components/LeadCapturePopup.tsx` | Redesign as eBook offer with name field, eBook cover mockup, updated copy |
+| `src/lib/translations.ts` | Add/update popup translation keys for eBook offer (EN + ES) |
+
+### Result
+- Browser tab shows CWT logo + "CWT - Community Water Test ORG"
+- Popup offers a compelling free eBook instead of generic "get information"
+- Form collects Name + Email + ZIP + Phone (optional) for CRM/email follow-up
+- Works in both English and Spanish
 
