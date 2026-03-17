@@ -18,6 +18,7 @@ import {
   getCityName,
   getStateData,
 } from "@/data/companies";
+import { SERVICES, getCompaniesByService, getCityWaterData, WATER_PROBLEMS } from "@/data/seoData";
 
 const CityPage = () => {
   const { state, city } = useParams();
@@ -124,6 +125,45 @@ const CityPage = () => {
               </div>
             </div>
           )}
+
+          {/* Browse by Service */}
+          {(() => {
+            const serviceLinks = SERVICES.filter((s) =>
+              getCompaniesByService(stateSlug, citySlug, s.key).length > 0
+            );
+            const waterData = getCityWaterData(cityName || "");
+            return serviceLinks.length > 0 ? (
+              <div className="mt-8">
+                <h2 className="text-xl font-bold mb-4">Browse by Service in {cityName}</h2>
+                <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 gap-3">
+                  {serviceLinks.map((svc) => (
+                    <Link
+                      key={svc.slug}
+                      to={`/water-treatment/${stateSlug}/${citySlug}/services/${svc.slug}`}
+                      className="p-3 bg-white border rounded-lg hover:border-blue-300 hover:shadow-sm text-center"
+                    >
+                      <p className="text-sm font-medium text-gray-800">{svc.shortLabel}</p>
+                      <p className="text-xs text-gray-500 mt-1">
+                        {getCompaniesByService(stateSlug, citySlug, svc.key).length} companies
+                      </p>
+                    </Link>
+                  ))}
+                </div>
+
+                {/* Quick links */}
+                <div className="flex flex-wrap gap-4 mt-4 text-sm">
+                  <Link to={`/best-water-treatment/${stateSlug}/${citySlug}`} className="text-blue-600 hover:underline font-medium">
+                    Top Rated Companies in {cityName} →
+                  </Link>
+                  {waterData && (
+                    <Link to={`/water-quality/${citySlug}`} className="text-blue-600 hover:underline font-medium">
+                      {cityName} Water Quality Report →
+                    </Link>
+                  )}
+                </div>
+              </div>
+            ) : null;
+          })()}
 
           {/* CTA */}
           <div className="mt-8 bg-blue-50 rounded-xl p-8 text-center">

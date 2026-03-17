@@ -18,6 +18,7 @@ import {
 import type { Company } from "@/data/companies";
 import { CompanyCard } from "@/components/directory/CompanyCard";
 import { Helmet } from "@/components/seo/Helmet";
+import { getCityWaterData, SERVICES, WATER_PROBLEMS } from "@/data/seoData";
 
 const SERVICE_LABELS: Record<string, string> = {
   water_softener: "Water Softener Installation",
@@ -235,24 +236,59 @@ const CompanyPage = () => {
                 </Card>
               )}
 
-              {/* Water Quality Context */}
-              <Card>
-                <CardContent className="p-6">
-                  <h2 className="text-xl font-bold mb-3">
-                    Why Water Treatment Matters in {cityName}
-                  </h2>
-                  <p className="text-gray-600 leading-relaxed mb-4">
-                    Many homes in {cityName}, {stateName} experience issues with hard water,
-                    contaminants, and aging infrastructure. Professional water treatment companies
-                    like {company.name} can help identify and solve water quality problems
-                    with solutions ranging from whole-house filtration to reverse osmosis systems.
-                  </p>
-                  <p className="text-gray-600 leading-relaxed">
-                    Getting a water test is the first step to understanding what's in your water.
-                    Schedule a free test below to get started.
-                  </p>
-                </CardContent>
-              </Card>
+              {/* Water Quality Context + Internal Links */}
+              {(() => {
+                const waterData = getCityWaterData(cityName);
+                return (
+                  <Card>
+                    <CardContent className="p-6">
+                      <h2 className="text-xl font-bold mb-3">
+                        Why Water Treatment Matters in {cityName}
+                      </h2>
+                      {waterData ? (
+                        <>
+                          <p className="text-gray-600 leading-relaxed mb-3">
+                            {cityName}'s water from {waterData.source} is classified as <strong>{waterData.hardness}</strong> ({waterData.hardnessGrains}).
+                            Top contaminants include {waterData.topContaminants.slice(0, 3).join(", ")}.
+                            Professional water treatment companies like {company.name} can help address these local water challenges.
+                          </p>
+                          <Link to={`/water-quality/${citySlug}`} className="text-sm text-blue-600 hover:underline">
+                            Read the full {cityName} Water Quality Report →
+                          </Link>
+                        </>
+                      ) : (
+                        <p className="text-gray-600 leading-relaxed">
+                          Many homes in {cityName}, {stateName} experience issues with hard water,
+                          contaminants, and aging infrastructure. Professional water treatment companies
+                          like {company.name} can help identify and solve water quality problems.
+                        </p>
+                      )}
+
+                      {/* Related service links */}
+                      {company.services?.length > 0 && (
+                        <div className="mt-4 pt-4 border-t">
+                          <p className="text-sm font-semibold text-gray-700 mb-2">Compare {company.name}'s services in {cityName}:</p>
+                          <div className="flex flex-wrap gap-2">
+                            {company.services.map((svc) => {
+                              const svcDef = SERVICES.find((s) => s.key === svc);
+                              if (!svcDef) return null;
+                              return (
+                                <Link
+                                  key={svc}
+                                  to={`/water-treatment/${stateSlug}/${citySlug}/services/${svcDef.slug}`}
+                                  className="text-xs px-3 py-1 bg-blue-50 text-blue-700 rounded-full hover:bg-blue-100"
+                                >
+                                  {svcDef.shortLabel}
+                                </Link>
+                              );
+                            })}
+                          </div>
+                        </div>
+                      )}
+                    </CardContent>
+                  </Card>
+                );
+              })()}
             </div>
 
             {/* Sidebar */}
