@@ -1,7 +1,10 @@
 import { Card, CardContent } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
-import { Star, Phone, Globe, MapPin } from "lucide-react";
+import {
+  Star, Phone, Globe, MapPin, Droplets, Filter, FlaskConical, Home,
+  Sun, ShieldCheck, Waves, Building2, TestTube, CheckCircle2
+} from "lucide-react";
 import { Link } from "react-router-dom";
 import type { Company } from "@/data/companies";
 
@@ -9,6 +12,19 @@ const AVATAR_COLORS = [
   "bg-blue-600", "bg-emerald-600", "bg-purple-600", "bg-amber-600",
   "bg-rose-600", "bg-cyan-600", "bg-indigo-600", "bg-teal-600",
 ];
+
+// GasBuddy-style amenity icons for water treatment services
+const SERVICE_ICONS: Record<string, { icon: React.ElementType; label: string; color: string }> = {
+  water_softener: { icon: Droplets, label: "Softener", color: "text-blue-600" },
+  reverse_osmosis: { icon: Filter, label: "RO System", color: "text-cyan-600" },
+  whole_house_filtration: { icon: Home, label: "Whole House", color: "text-emerald-600" },
+  alkaline_water: { icon: FlaskConical, label: "Alkaline", color: "text-purple-600" },
+  uv_sterilization: { icon: Sun, label: "UV Sterilize", color: "text-amber-600" },
+  iron_removal: { icon: ShieldCheck, label: "Iron Removal", color: "text-rose-600" },
+  water_testing: { icon: TestTube, label: "Free Test", color: "text-indigo-600" },
+  well_water: { icon: Waves, label: "Well Water", color: "text-teal-600" },
+  commercial: { icon: Building2, label: "Commercial", color: "text-slate-600" },
+};
 
 const SERVICE_LABELS: Record<string, string> = {
   water_softener: "Water Softener",
@@ -84,21 +100,47 @@ export function CompanyCard({ company }: CompanyCardProps) {
           <p className="text-xs text-gray-500 mb-3 line-clamp-2">{company.description}</p>
         )}
 
-        {/* Services */}
+        {/* GasBuddy-style Service Amenity Icons */}
         {company.services?.length > 0 && (
-          <div className="flex flex-wrap gap-1 mb-3">
-            {company.services.slice(0, 3).map((svc) => (
-              <Badge key={svc} variant="secondary" className="text-xs py-0">
-                {SERVICE_LABELS[svc] || svc}
-              </Badge>
-            ))}
-            {company.services.length > 3 && (
-              <Badge variant="outline" className="text-xs py-0">
-                +{company.services.length - 3}
-              </Badge>
+          <div className="flex flex-wrap gap-2 mb-3">
+            {company.services.slice(0, 5).map((svc) => {
+              const svcConfig = SERVICE_ICONS[svc];
+              if (!svcConfig) return null;
+              const Icon = svcConfig.icon;
+              return (
+                <div
+                  key={svc}
+                  className="flex items-center gap-1 px-2 py-1 bg-gray-50 rounded-md border border-gray-100"
+                  title={SERVICE_LABELS[svc] || svc}
+                >
+                  <Icon className={`w-3.5 h-3.5 ${svcConfig.color}`} />
+                  <span className="text-xs font-medium text-gray-700">{svcConfig.label}</span>
+                </div>
+              );
+            })}
+            {company.services.length > 5 && (
+              <div className="flex items-center gap-1 px-2 py-1 bg-gray-50 rounded-md border border-gray-100">
+                <span className="text-xs font-medium text-gray-500">+{company.services.length - 5}</span>
+              </div>
             )}
           </div>
         )}
+
+        {/* Highlights row - GasBuddy style feature badges */}
+        <div className="flex flex-wrap gap-2 mb-3">
+          {company.services?.includes("water_testing") && (
+            <div className="flex items-center gap-1 text-xs text-emerald-700 bg-emerald-50 px-2 py-1 rounded-full">
+              <CheckCircle2 className="w-3 h-3" />
+              <span>Free Water Test</span>
+            </div>
+          )}
+          {company.googleReviewCount != null && company.googleReviewCount >= 100 && (
+            <div className="flex items-center gap-1 text-xs text-amber-700 bg-amber-50 px-2 py-1 rounded-full">
+              <Star className="w-3 h-3 fill-amber-500 text-amber-500" />
+              <span>Top Rated</span>
+            </div>
+          )}
+        </div>
 
         {/* Contact info */}
         <div className="space-y-1.5 text-sm text-gray-600 mb-4 flex-1">
@@ -122,12 +164,25 @@ export function CompanyCard({ company }: CompanyCardProps) {
           )}
         </div>
 
-        {/* CTA */}
-        <Link to="/schedule-test" className="mt-auto">
-          <Button className="w-full bg-blue-600 hover:bg-blue-700" size="sm">
-            Get Quote
-          </Button>
-        </Link>
+        {/* GasBuddy-style Action Bar */}
+        <div className="flex gap-2 mt-auto">
+          {company.phone && (
+            <a
+              href={`tel:${company.phone.replace(/\D/g, "")}`}
+              className="flex-1"
+            >
+              <Button variant="outline" className="w-full" size="sm">
+                <Phone className="w-4 h-4 mr-1" />
+                Call
+              </Button>
+            </a>
+          )}
+          <Link to="/schedule-test" className={company.phone ? "flex-1" : "w-full"}>
+            <Button className="w-full bg-blue-600 hover:bg-blue-700" size="sm">
+              Get Quote
+            </Button>
+          </Link>
+        </div>
       </CardContent>
     </Card>
   );
