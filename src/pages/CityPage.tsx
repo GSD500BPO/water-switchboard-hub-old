@@ -3,31 +3,35 @@ import { Header } from "@/components/layout/Header";
 import { Footer } from "@/components/layout/Footer";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
-import { Badge } from "@/components/ui/badge";
-import { Star, MapPin, Phone, ArrowLeft, Clock } from "lucide-react";
-import { getCompaniesByCity, getAverageRating, getTotalReviews } from "@/data/companies";
-
-const serviceLabels: Record<string, string> = {
-  water_softening: "Water Softening",
-  reverse_osmosis: "Reverse Osmosis",
-  ro_systems: "RO Systems",
-  filtration: "Filtration",
-  alkaline_water: "Alkaline Water",
-  whole_house: "Whole House",
-  uv_sterilization: "UV Sterilization",
-  iron_removal: "Iron Removal",
-};
+import {
+  Carousel,
+  CarouselContent,
+  CarouselItem,
+  CarouselPrevious,
+  CarouselNext,
+} from "@/components/ui/carousel";
+import { CompanyCard } from "@/components/directory/CompanyCard";
+import { ArrowLeft, MapPin, Star } from "lucide-react";
+import {
+  getCompaniesByCity,
+  getCitiesInState,
+  getCityName,
+  getStateData,
+} from "@/data/companies";
 
 const CityPage = () => {
   const { state, city } = useParams();
-  const stateSlug = state || "utah";
-  const citySlug = city || "salt-lake-city";
-  
+  const stateSlug = state || "";
+  const citySlug = city || "";
+
   const companies = getCompaniesByCity(stateSlug, citySlug);
-  
-  const cityName = citySlug.replace(/-/g, ' ').replace(/\b\w/g, l => l.toUpperCase());
-  const stateName = stateSlug.replace(/-/g, ' ').replace(/\b\w/g, l => l.toUpperCase());
-  
+  const stateData = getStateData(stateSlug);
+  const cityName = getCityName(stateSlug, citySlug);
+  const stateName = stateData?.name || stateSlug.replace(/-/g, " ").replace(/\b\w/g, (l) => l.toUpperCase());
+
+  // Nearby cities (same state, excluding current)
+  const nearbyCities = getCitiesInState(stateSlug).filter((c) => c.slug !== citySlug);
+
   return (
     <div className="min-h-screen flex flex-col">
       <Header />
@@ -38,7 +42,9 @@ const CityPage = () => {
             <div className="flex items-center gap-2 text-sm text-gray-600">
               <Link to="/" className="hover:text-blue-600">Home</Link>
               <span>/</span>
-              <Link to={`/water-treatment/${stateSlug}`} className="hover:text-blue-600">{stateName}</Link>
+              <Link to={`/water-treatment/${stateSlug}`} className="hover:text-blue-600">
+                {stateName}
+              </Link>
               <span>/</span>
               <span className="font-medium text-gray-900">{cityName}</span>
             </div>
@@ -48,7 +54,10 @@ const CityPage = () => {
         {/* Hero */}
         <div className="bg-blue-600 text-white py-8">
           <div className="container mx-auto px-4">
-            <Link to={`/water-treatment/${stateSlug}`} className="inline-flex items-center text-blue-100 hover:text-white mb-4">
+            <Link
+              to={`/water-treatment/${stateSlug}`}
+              className="inline-flex items-center text-blue-100 hover:text-white mb-4"
+            >
               <ArrowLeft className="w-4 h-4 mr-1" />
               Back to {stateName}
             </Link>
@@ -60,17 +69,7 @@ const CityPage = () => {
         </div>
 
         <div className="container mx-auto px-4 py-8">
-          {/* Service Filters */}
-          <div className="flex flex-wrap gap-2 mb-6">
-            <Badge className="bg-blue-600 cursor-pointer">All Services</Badge>
-            {Object.values(serviceLabels).map((label) => (
-              <Badge key={label} variant="outline" className="cursor-pointer hover:bg-gray-100">
-                {label}
-              </Badge>
-            ))}
-          </div>
-
-          {/* Company List */}
+          {/* Company Grid */}
           {companies.length === 0 ? (
             <div className="text-center py-12">
               <p className="text-gray-500">No companies found for this area yet.</p>
@@ -81,107 +80,46 @@ const CityPage = () => {
               </Link>
             </div>
           ) : (
-            <div className="space-y-4">
-              {companies.map((company) => {
-                const avgRating = getAverageRating(company);
-                const totalReviews = getTotalReviews(company);
-                
-                return (
-                  <Card key={company.id} className="hover:shadow-lg transition-shadow">
-                    <CardContent className="p-6">
-                      <div className="flex flex-col md:flex-row md:items-start gap-6">
-                        {/* Left: Company Info */}
-                        <div className="flex-1">
-                          <div className="flex items-start justify-between mb-2">
-                            <div>
-                              <h3 className="text-xl font-bold">{company.name}</h3>
-                              <div className="flex items-center gap-1 mt-1">
-                                <Star className="w-5 h-5 fill-yellow-400 text-yellow-400" />
-                                <span className="font-bold text-lg">{avgRating}</span>
-                                <span className="text-gray-500">({totalReviews} reviews)</span>
-                              </div>
-                            </div>
-                            <Button className="bg-blue-600 hover:bg-blue-700">
-                              Get Quote
-                            </Button>
-                          </div>
+            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4">
+              {companies.map((company) => (
+                <CompanyCard key={company.id} company={company} />
+              ))}
+            </div>
+          )}
 
-                          <div className="flex flex-wrap gap-2 mb-3">
-                            {company.services.map((svc: string) => (
-                              <Badge key={svc} variant="secondary">
-                                {serviceLabels[svc] || svc}
-                              </Badge>
-                            ))}
-                          </div>
-
-                          <div className="space-y-2 text-sm text-gray-600">
-                            <div className="flex items-center gap-2">
-                              <MapPin className="w-4 h-4" />
-                              {company.address.street}, {company.address.city}, {company.address.state} {company.address.zip}
-                            </div>
-                            <div className="flex items-center gap-2">
-                              <Phone className="w-4 h-4" />
-                              {company.phone}
-                            </div>
-                          </div>
-                        </div>
-
-                        {/* Right: Review Sources */}
-                        <div className="md:w-64 bg-gray-50 rounded-lg p-4">
-                          <h4 className="font-semibold mb-3 text-sm">Review Sources</h4>
-                          <div className="space-y-2">
-                            {company.reviews?.google && (
-                              <a 
-                                href={company.reviews.google.url} 
-                                target="_blank" 
-                                rel="noopener noreferrer"
-                                className="flex items-center justify-between text-sm hover:bg-white p-2 rounded"
-                              >
-                                <span>Google</span>
-                                <div className="flex items-center gap-1">
+          {/* Nearby Cities */}
+          {nearbyCities.length > 0 && (
+            <div className="mt-12">
+              <h2 className="text-xl font-bold mb-4">Nearby Cities in {stateName}</h2>
+              <div className="px-12">
+                <Carousel opts={{ align: "start", loop: false }}>
+                  <CarouselContent>
+                    {nearbyCities.map((nc) => (
+                      <CarouselItem key={nc.slug} className="basis-1/2 md:basis-1/3 lg:basis-1/5">
+                        <Link to={`/water-treatment/${stateSlug}/${nc.slug}`}>
+                          <Card className="hover:shadow-md transition-shadow cursor-pointer h-full">
+                            <CardContent className="p-4 text-center">
+                              <MapPin className="w-5 h-5 mx-auto mb-2 text-blue-600" />
+                              <p className="font-semibold text-sm">{nc.name}</p>
+                              <p className="text-xs text-gray-500 mt-1">
+                                {nc.companyCount} companies
+                              </p>
+                              {nc.avgRating != null && (
+                                <div className="flex items-center justify-center gap-1 mt-1">
                                   <Star className="w-3 h-3 fill-yellow-400 text-yellow-400" />
-                                  <span>{company.reviews.google.rating}</span>
-                                  <span className="text-gray-400">({company.reviews.google.count})</span>
+                                  <span className="text-xs text-gray-600">{nc.avgRating}</span>
                                 </div>
-                              </a>
-                            )}
-                            {company.reviews?.yelp && (
-                              <a 
-                                href={company.reviews.yelp.url} 
-                                target="_blank" 
-                                rel="noopener noreferrer"
-                                className="flex items-center justify-between text-sm hover:bg-white p-2 rounded"
-                              >
-                                <span>Yelp</span>
-                                <div className="flex items-center gap-1">
-                                  <Star className="w-3 h-3 fill-yellow-400 text-yellow-400" />
-                                  <span>{company.reviews.yelp.rating}</span>
-                                  <span className="text-gray-400">({company.reviews.yelp.count})</span>
-                                </div>
-                              </a>
-                            )}
-                            {company.reviews?.angi && (
-                              <a 
-                                href={company.reviews.angi.url} 
-                                target="_blank" 
-                                rel="noopener noreferrer"
-                                className="flex items-center justify-between text-sm hover:bg-white p-2 rounded"
-                              >
-                                <span>Angi</span>
-                                <div className="flex items-center gap-1">
-                                  <Star className="w-3 h-3 fill-yellow-400 text-yellow-400" />
-                                  <span>{company.reviews.angi.rating}</span>
-                                  <span className="text-gray-400">({company.reviews.angi.count})</span>
-                                </div>
-                              </a>
-                            )}
-                          </div>
-                        </div>
-                      </div>
-                    </CardContent>
-                  </Card>
-                );
-              })}
+                              )}
+                            </CardContent>
+                          </Card>
+                        </Link>
+                      </CarouselItem>
+                    ))}
+                  </CarouselContent>
+                  <CarouselPrevious />
+                  <CarouselNext />
+                </Carousel>
+              </div>
             </div>
           )}
 
