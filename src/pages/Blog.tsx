@@ -1,7 +1,7 @@
 import React, { useMemo, useState } from 'react';
 import { useParams } from 'react-router-dom';
 import { BookOpen } from 'lucide-react';
-import { blogPosts, blogCategories } from '@/data/blog';
+import { allBlogPosts, blogCategories } from '@/data/blog';
 import { BlogCard } from '@/components/blog/BlogCard';
 import { BlogSearchBar } from '@/components/blog/BlogSearchBar';
 import { BlogCategoryFilter } from '@/components/blog/BlogCategoryFilter';
@@ -14,7 +14,7 @@ const Blog = () => {
   const [searchQuery, setSearchQuery] = useState('');
 
   const filteredPosts = useMemo(() => {
-    let posts = blogPosts;
+    let posts = allBlogPosts;
 
     // Filter by category
     if (category) {

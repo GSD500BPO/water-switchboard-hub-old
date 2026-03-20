@@ -131,6 +131,25 @@ def main():
                         "changefreq": "monthly",
                     })
 
+    # Blog pages
+    blog_dir = Path(__file__).parent.parent / "public" / "blogs"
+    blog_count = 0
+    if blog_dir.exists():
+        # Blog index page
+        urls.append({
+            "loc": f"{BASE_URL}/blog",
+            "priority": "0.7",
+            "changefreq": "weekly",
+        })
+        for md_file in sorted(blog_dir.glob("*.md")):
+            slug = md_file.stem
+            urls.append({
+                "loc": f"{BASE_URL}/blog/{slug}",
+                "priority": "0.6",
+                "changefreq": "monthly",
+            })
+            blog_count += 1
+
     # Generate sitemap XML
     xml_parts = ['<?xml version="1.0" encoding="UTF-8"?>']
     xml_parts.append('<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">')
@@ -168,6 +187,7 @@ def main():
     print(f"  Best-of:          {best_of_count}")
     print(f"  Water quality:    {water_quality_count}")
     print(f"  Water problems:   {problem_count}")
+    print(f"  Blog posts:       {blog_count}")
     print(f"  ──────────────────")
     print(f"  TOTAL:            {len(urls)}")
 

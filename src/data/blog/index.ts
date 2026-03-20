@@ -1,4 +1,5 @@
 import { BlogPost } from './types';
+import { generatedBlogPosts } from './generatedBlogPosts';
 
 // Water treatment focused blog categories
 export const blogCategories = [
@@ -118,19 +119,22 @@ export const blogPosts: BlogPost[] = [
   }
 ];
 
+// Merge manually curated + generated CWT blog posts
+export const allBlogPosts: BlogPost[] = [...blogPosts, ...generatedBlogPosts];
+
 // Helper functions
 export const getBlogPostBySlug = (slug: string): BlogPost | undefined => {
-  return blogPosts.find(p => p.slug === slug);
+  return allBlogPosts.find(p => p.slug === slug);
 };
 
 export const getBlogPostsByCategory = (category: string): BlogPost[] => {
-  return blogPosts.filter(p => 
+  return allBlogPosts.filter(p =>
     p.category.toLowerCase() === category.toLowerCase()
   );
 };
 
 export const getRelatedPosts = (currentPostId: number, category: string, limit: number = 3): BlogPost[] => {
-  return blogPosts
+  return allBlogPosts
     .filter(p => p.id !== currentPostId && p.category === category)
     .slice(0, limit);
 };
